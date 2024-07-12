@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TagManager from 'react-gtm-module';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { LocalStorageKeys } from 'librechat-data-provider';
@@ -27,6 +27,8 @@ export default function useAppStartup({
   user?: TUser;
 }) {
   useConfigOverride();
+  const [isGtmInitialized, setIsGtmInitialized] = useState(false);
+  const [isGtmUserInitialized, setIsGtmUserInitialized] = useState(false);
   const setAvailableTools = useSetRecoilState(store.availableTools);
   const [defaultPreset, setDefaultPreset] = useRecoilState(store.defaultPreset);
   const { data: allPlugins } = useAvailablePluginsQuery({
@@ -100,10 +102,14 @@ export default function useAppStartup({
     setAvailableTools({ pluginStore, ...mapPlugins(tools) });
   }, [allPlugins, user, setAvailableTools]);
 
-  if (startupConfig?.analyticsGtmId) {
-    const tagManagerArgs = {
-      gtmId: startupConfig?.analyticsGtmId,
-    };
-    TagManager.initialize(tagManagerArgs);
-  }
+  useEffect(() => {
+    if (startupConfig?.analyticsGtmId && !isGtmInitialized) {
+      setIsGtmInitialized(true);
+
+      const tagManagerArgs = {
+        gtmId: startupConfig?.analyticsGtmId,
+      };
+      TagManager.initialize(tagManagerArgs);
+    }
+  }, [startupConfig]);
 }

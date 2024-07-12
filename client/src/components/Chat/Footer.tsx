@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import TagManager from 'react-gtm-module';
@@ -34,12 +35,14 @@ export default function Footer({ className }: { className?: string }) {
     </a>
   );
 
-  if (config?.analyticsGtmId) {
-    const tagManagerArgs = {
-      gtmId: config?.analyticsGtmId,
-    };
-    TagManager.initialize(tagManagerArgs);
-  }
+  useEffect(() => {
+    if (config?.analyticsGtmId) {
+      const tagManagerArgs = {
+        gtmId: config?.analyticsGtmId,
+      };
+      TagManager.initialize(tagManagerArgs);
+    }
+  });
 
   const mainContentParts = (
     typeof config?.customFooter === 'string'
